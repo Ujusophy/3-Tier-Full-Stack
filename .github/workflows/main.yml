@@ -23,34 +23,13 @@ jobs:
           node-version: 18.x
 
       - name: Run Unit Tests
-        run: | 
-          npm install
-          npm test 
-
-  build:
-    runs-on: ubuntu-latest
-    needs: test  
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v3
-
-      - name: Install Node
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Install Dependencies
         run: |
           npm install
-
-      - name: Build Project
-        run: |
-          npm run build
-          tar -czvf next.tar.gz build/
+          npm test
 
   deploy:
+    needs: test
     runs-on: ubuntu-latest
-    needs: build  
     steps:
       - name: Deploy to server
         uses: appleboy/ssh-action@v0.1.3
@@ -60,6 +39,7 @@ jobs:
           key: ${{ secrets.SSH_KEY }}
           script: |
             echo "About to Deploy"
-            cd /path/to/your/project
+            cd project
             git pull
+            npm install
             npm start
